@@ -122,6 +122,17 @@ export default function SandboxEditor({
           iDContext.init();
         }
 
+        // Listen for imagery to load, then hide OpenAerialMapMosaic
+        // We do this after init() to ensure the background module is available
+        iDContext.background().on('change.hide-oam', () => {
+          const oamSource = iDContext.background().findSource('OpenAerialMapMosaic');
+          if (oamSource) {
+            oamSource.isBlocked = true;
+            // Stop listening once we've hidden it
+            iDContext.background().on('change.hide-oam', null);
+          }
+        });
+
         if (gpxUrl) {
           iDContext.layers().layer('data').url(gpxUrl, '.gpx');
         }
